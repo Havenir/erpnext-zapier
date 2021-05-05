@@ -50,24 +50,26 @@ module.exports = {
   oauth2Config: {
     authorizeUrl: getAuthorizeRequest(),
     getAccessToken: (z, bundle) => {
-      return postMethod(z, bundle.inputData.BASE_URL, OAUTH_TOKEN_METHOD, {
-        code: bundle.inputData.code,
-        client_id: bundle.inputData.CLIENT_ID,
-        client_secret: bundle.inputData.CLIENT_SECRET,
-        grant_type: 'authorization_code',
-        redirect_uri: bundle.inputData.redirect_uri,
-      }).then(response => {
+
+      formData.append("code", bundle.authData.code)
+      formData.append("client_id", bundle.authData.CLIENT_ID)
+      formData.append("client_secret", bundle.authData.CLIENT_SECRET)
+      formData.append("grant_type", 'authorization_code')
+      formData.append("redirect_uri", bundle.inputData.redirect_uri)
+
+      return postMethod(z, bundle.authData.BASE_URL, OAUTH_TOKEN_METHOD, formData).then(response => {
         return response;
       });
     },
     refreshAccessToken: (z, bundle) => {
-      return postMethod(z, bundle.authData.BASE_URL, OAUTH_TOKEN_METHOD, {
-        refresh_token: bundle.authData.refresh_token,
-        client_id: bundle.authData.CLIENT_ID,
-        client_secret: bundle.authData.CLIENT_SECRET,
-        grant_type: 'refresh_token',
-        redirect_uri: bundle.inputData.redirect_uri,
-      });
+      let formData = new FormData()
+      formData.append("refresh_token", bundle.authData.refresh_token)
+      formData.append("client_id", bundle.authData.CLIENT_ID)
+      formData.append("client_secret", bundle.authData.CLIENT_SECRET)
+      formData.append("grant_type", 'refresh_token')
+      formData.append("redirect_uri", bundle.inputData.redirect_uri)
+
+      return postMethod(z, bundle.authData.BASE_URL, OAUTH_TOKEN_METHOD, formData);
     },
     autoRefresh: true,
     scope: 'all',
